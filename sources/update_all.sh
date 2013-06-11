@@ -16,14 +16,21 @@
 #
 #------------------------------------------------------------------------------
 
+EXEC_RUBY="$TAGINFO_RUBY"
+if [ "x$EXEC_RUBY" = "x" ]; then
+    EXEC_RUBY=ruby
+fi
+echo "Running with ruby set as '${EXEC_RUBY}'"
+
+
 # These sources will be downloaded from http://taginfo.openstreetmap.org/download/
 # Note that this will NOT work for the "db" source! Well, you can download it,
 # but it will fail later, because the database is changed by the master.sql
 # scripts.
-SOURCES_DOWNLOAD=`../bin/taginfo-config.rb sources.download`
+SOURCES_DOWNLOAD=`$EXEC_RUBY ../bin/taginfo-config.rb sources.download`
 
 # These sources will be created from the actual sources
-SOURCES_CREATE=`../bin/taginfo-config.rb sources.create`
+SOURCES_CREATE=`$EXEC_RUBY ../bin/taginfo-config.rb sources.create`
 
 #------------------------------------------------------------------------------
 
@@ -39,11 +46,11 @@ if [ "x" = "x$DIR" ]; then
 fi
 
 LOGFILE=`date +%Y%m%dT%H%M`
+
+echo "`$DATECMD` Start update_all... $DIR/log"
+
 mkdir -p $DIR/log
 exec >$DIR/log/$LOGFILE.log 2>&1
-
-echo "`$DATECMD` Start update_all..."
-
 mkdir -p $DIR/download
 
 for source in $SOURCES_DOWNLOAD; do
@@ -60,7 +67,7 @@ for source in $SOURCES_CREATE; do
     echo "Running $source/update.sh..."
     mkdir -p $DIR/$source
     cd $source
-    ./update.sh $DIR/$source
+    sh ./update.sh $DIR/$source
     cd ..
     echo "Done."
 done
@@ -68,7 +75,7 @@ done
 echo "====================================="
 echo "Running master/update.sh..."
 cd master
-./update.sh $DIR
+sh ./update.sh $DIR
 cd ..
 
 for source in $SOURCES_CREATE; do
