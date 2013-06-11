@@ -376,6 +376,7 @@ class TagStatsHandler : public Osmium::Handler::Base {
                   << std::endl;
 
         char filename[100];
+#ifndef WIN32
         sprintf(filename, "/proc/%d/status", getpid());
         std::ifstream status_file(filename);
         std::string line;
@@ -389,6 +390,7 @@ class TagStatsHandler : public Osmium::Handler::Base {
             }
             status_file.close();
         }
+#endif
 
     }
 
